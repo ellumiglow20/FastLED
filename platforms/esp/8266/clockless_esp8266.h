@@ -79,7 +79,7 @@ protected:
     uint32_t start = __clock_cycles();
 		uint32_t last_mark = start;
 
-    register bool hasWhite = pixels.hasWhiteChannel();
+    register bool is4BytePel = pixels.hasSlot3();
 
 		while(pixels.has(1)) {
 			// Write first byte, read next byte
@@ -94,8 +94,8 @@ protected:
 			writeBits<8+XTRA0>(last_mark, b);
       b = pixels.advanceAndLoadAndScale0();
 
-      if (hasWhite) {
-        // Write dummy white pel
+      if (is4BytePel) {
+        // Write dummy (zero) forth byte
         writeBits<8+XTRA0>(last_mark, 0);
       }
 

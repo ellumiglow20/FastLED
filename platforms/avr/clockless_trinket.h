@@ -362,7 +362,7 @@ protected:
 
 		uint8_t loopvar=0;
 
-    register bool hasWhite = pixels.hasWhiteChannel();
+    register bool is4BytePel = pixels.hasSlot3();
 
 		// This has to be done in asm to keep gcc from messing up the asm code further down
 		b0 = data[RO(0)];
@@ -446,8 +446,8 @@ protected:
           case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
         }
 
-        if (hasWhite) {
-          /** Dummy white **/
+        if (is4BytePel) {
+          /**  Write dummy (zero) forth byte **/
           DNOP D2(1) LO1 DNOP D3(1)
           HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
           HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)

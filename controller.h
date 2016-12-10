@@ -340,6 +340,9 @@ struct PixelController {
             d[RO(0)] = e[RO(0)] - d[RO(0)];
         }
 
+        // Determines whether or not the underlying pixel format is valid for a given "slot" e.g. color channel
+        template<int SLOT> __attribute__((always_inline)) inline bool hasSlot() { RO(SLOT) != 0xFF; }
+
         template<int SLOT>  __attribute__((always_inline)) inline static uint8_t loadByte(PixelController & pc) { return pc.mData[RO(SLOT)]; }
         template<int SLOT>  __attribute__((always_inline)) inline static uint8_t loadByte(PixelController & pc, int lane) { return pc.mData[pc.mOffsets[lane] + RO(SLOT)]; }
 
@@ -374,10 +377,11 @@ struct PixelController {
         __attribute__((always_inline)) inline uint8_t advanceAndLoadAndScale0() { return advanceAndLoadAndScale<0>(*this); }
         __attribute__((always_inline)) inline uint8_t stepAdvanceAndLoadAndScale0() { stepDithering(); return advanceAndLoadAndScale<0>(*this); }
 
-        __attribute__((always_inline)) inline bool hasRedChannel() { return RO(0) != 0xFF; }
-        __attribute__((always_inline)) inline bool hasGreenChannel() { return RO(1) != 0xFF; }
-        __attribute__((always_inline)) inline bool hasBlueChannel() { return RO(2) != 0xFF; }
-        __attribute__((always_inline)) inline bool hasWhiteChannel() { return RO(3) != 0xFF; }
+        // Determines whether or not the underlying pixel format is valid for a given "slot" e.g. color channel
+        __attribute__((always_inline)) inline bool hasSlot0() { return hasSlot<0>(); }
+        __attribute__((always_inline)) inline bool hasSlot1() { return hasSlot<1>(); }
+        __attribute__((always_inline)) inline bool hasSlot2() { return hasSlot<2>(); }
+        __attribute__((always_inline)) inline bool hasSlot3() { return hasSlot<3>(); }
 };
 
 template<EOrder RGB_ORDER, int LANES=1, uint32_t MASK=0xFFFFFFFF> class CPixelLEDController : public CLEDController {

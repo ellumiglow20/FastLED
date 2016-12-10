@@ -120,6 +120,8 @@ public:
 		// Setup the pixel controller and load/scale the first byte
 		Lines b0;
 
+    register bool is4BytePel = allpixels.hasSlot3();
+
 		for(int i = 0; i < USED_LANES; i++) {
 			b0.bytes[i] = allpixels.loadAndScale0(i);
 		}
@@ -139,6 +141,11 @@ public:
 
 			// Write third byte
 			writeBits<8+XTRA0,0>(last_mark, b0, allpixels);
+
+      if (is4BytePel) {
+        // Write dummy (zero) forth byte
+        writeBits<8+XTRA0>(last_mark, 0);
+      }
 
       #if (FASTLED_ALLOW_INTERRUPTS == 1)
 			os_intr_unlock();
