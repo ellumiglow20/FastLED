@@ -362,6 +362,8 @@ protected:
 
 		uint8_t loopvar=0;
 
+    register bool hasWhite = pixels.hasWhiteChannel();
+
 		// This has to be done in asm to keep gcc from messing up the asm code further down
 		b0 = data[RO(0)];
 		{
@@ -444,21 +446,23 @@ protected:
           case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
         }
 
-        /** Dummy white **/
-        DNOP D2(1) LO1 DNOP D3(1)
-        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
-        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
-        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
-        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
-        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
-        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
-        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
-        HI1 D1(1) DNOP LO1
-        switch(XTRA0) {
-          case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-          case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-          case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-          case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+        if (hasWhite) {
+          /** Dummy white **/
+          DNOP D2(1) LO1 DNOP D3(1)
+          HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+          HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+          HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+          HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+          HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+          HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+          HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+          HI1 D1(1) DNOP LO1
+          switch(XTRA0) {
+            case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+            case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+            case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+            case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          }
         }
 
         MOV_ADDDE04(b0,b1,d0,e0) D2(4) LO1 D3(5)

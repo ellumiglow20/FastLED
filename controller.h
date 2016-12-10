@@ -12,11 +12,12 @@
 FASTLED_NAMESPACE_BEGIN
 
 #define RO(X) RGB_BYTE(RGB_ORDER, X)
-#define RGB_BYTE(RO,X) (((RO)>>(3*(2-(X)))) & 0x3)
+#define RGB_BYTE(RO,X) (((RO)>>(4*(3-(X)))) & 0x3)
 
-#define RGB_BYTE0(RO) ((RO>>6) & 0x3)
-#define RGB_BYTE1(RO) ((RO>>3) & 0x3)
-#define RGB_BYTE2(RO) ((RO) & 0x3)
+#define RGB_BYTE0(RO) ((RO>>12) & 0x3)
+#define RGB_BYTE1(RO) ((RO>>8) & 0x3)
+#define RGB_BYTE2(RO) ((RO>>4) & 0x3)
+#define RGB_BYTE3(RO) ((RO) & 0x3)
 
 // operator byte *(struct CRGB[] arr) { return (byte*)arr; }
 
@@ -372,6 +373,11 @@ struct PixelController {
         __attribute__((always_inline)) inline uint8_t loadAndScale2() { return loadAndScale<2>(*this); }
         __attribute__((always_inline)) inline uint8_t advanceAndLoadAndScale0() { return advanceAndLoadAndScale<0>(*this); }
         __attribute__((always_inline)) inline uint8_t stepAdvanceAndLoadAndScale0() { stepDithering(); return advanceAndLoadAndScale<0>(*this); }
+
+        __attribute__((always_inline)) inline bool hasRedChannel() { return RO(0) != 0xFF; }
+        __attribute__((always_inline)) inline bool hasGreenChannel() { return RO(1) != 0xFF; }
+        __attribute__((always_inline)) inline bool hasBlueChannel() { return RO(2) != 0xFF; }
+        __attribute__((always_inline)) inline bool hasWhiteChannel() { return RO(3) != 0xFF; }
 };
 
 template<EOrder RGB_ORDER, int LANES=1, uint32_t MASK=0xFFFFFFFF> class CPixelLEDController : public CLEDController {

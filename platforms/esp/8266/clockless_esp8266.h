@@ -78,6 +78,9 @@ protected:
 		os_intr_lock();
     uint32_t start = __clock_cycles();
 		uint32_t last_mark = start;
+
+    register bool hasWhite = pixels.hasWhiteChannel();
+
 		while(pixels.has(1)) {
 			// Write first byte, read next byte
 			writeBits<8+XTRA0>(last_mark, b);
@@ -91,8 +94,10 @@ protected:
 			writeBits<8+XTRA0>(last_mark, b);
       b = pixels.advanceAndLoadAndScale0();
 
-      // Write dummy white pel
-      writeBits<8+XTRA0>(last_mark, 0);
+      if (hasWhite) {
+        // Write dummy white pel
+        writeBits<8+XTRA0>(last_mark, 0);
+      }
 
 			#if (FASTLED_ALLOW_INTERRUPTS == 1)
 			os_intr_unlock();
