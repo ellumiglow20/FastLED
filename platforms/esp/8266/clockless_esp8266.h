@@ -91,6 +91,9 @@ protected:
 			writeBits<8+XTRA0>(last_mark, b);
       b = pixels.advanceAndLoadAndScale0();
 
+      // Write dummy white pel
+      writeBits<8+XTRA0>(last_mark, 0);
+
 			#if (FASTLED_ALLOW_INTERRUPTS == 1)
 			os_intr_unlock();
 			#endif

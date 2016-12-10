@@ -378,74 +378,92 @@ protected:
 
 		{
 			// while(--count)
-			{
-				// Loop beginning
-				DNOP;
-				LOOP;
+      {
+        // Loop beginning
+        DNOP;
+        LOOP;
 
-				// Sum of the clock counts across each row should be 10 for 8Mhz, WS2811
-				// The values in the D1/D2/D3 indicate how many cycles the previous column takes
-				// to allow things to line back up.
-				//
-				// While writing out byte 0, we're loading up byte 1, applying the dithering adjustment,
-				// then scaling it using 8 cycles of shift/add interleaved in between writing the bits
-				// out.  When doing byte 1, we're doing the above for byte 2.  When we're doing byte 2,
-				// we're cycling back around and doing the above for byte 0.
+        // Sum of the clock counts across each row should be 10 for 8Mhz, WS2811
+        // The values in the D1/D2/D3 indicate how many cycles the previous column takes
+        // to allow things to line back up.
+        //
+        // While writing out byte 0, we're loading up byte 1, applying the dithering adjustment,
+        // then scaling it using 8 cycles of shift/add interleaved in between writing the bits
+        // out.  When doing byte 1, we're doing the above for byte 2.  When we're doing byte 2,
+        // we're cycling back around and doing the above for byte 0.
 
-				// Inline scaling - RGB ordering
-				// DNOP
-				HI1 D1(1) QLO2(b0, 7) LDSCL4(b1,O1) 	D2(4)	LO1	PRESCALEA2(d1)	D3(2)
-				HI1	D1(1) QLO2(b0, 6) PRESCALEB4(d1)	D2(4)	LO1	SCALE12(b1,0)	D3(2)
-				HI1 D1(1) QLO2(b0, 5) RORSC14(b1,1) 	D2(4)	LO1 RORCLC2(b1)		D3(2)
-				HI1 D1(1) QLO2(b0, 4) SCROR14(b1,2)		D2(4)	LO1 SCALE12(b1,3)	D3(2)
-				HI1 D1(1) QLO2(b0, 3) RORSC14(b1,4) 	D2(4)	LO1 RORCLC2(b1) 	D3(2)
-				HI1 D1(1) QLO2(b0, 2) SCROR14(b1,5) 	D2(4)	LO1 SCALE12(b1,6)	D3(2)
-				HI1 D1(1) QLO2(b0, 1) RORSC14(b1,7) 	D2(4)	LO1 RORCLC2(b1) 	D3(2)
-				HI1 D1(1) QLO2(b0, 0)
-				switch(XTRA0) {
-					case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-				}
-				MOV_ADDDE14(b0,b1,d1,e1) D2(4) LO1 D3(0)
+        // Inline scaling - RGB ordering
+        // DNOP
+        HI1 D1(1) QLO2(b0, 7) LDSCL4(b1,O1)   D2(4) LO1 PRESCALEA2(d1)  D3(2)
+        HI1 D1(1) QLO2(b0, 6) PRESCALEB4(d1)  D2(4) LO1 SCALE12(b1,0) D3(2)
+        HI1 D1(1) QLO2(b0, 5) RORSC14(b1,1)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 4) SCROR14(b1,2)   D2(4) LO1 SCALE12(b1,3) D3(2)
+        HI1 D1(1) QLO2(b0, 3) RORSC14(b1,4)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 2) SCROR14(b1,5)   D2(4) LO1 SCALE12(b1,6) D3(2)
+        HI1 D1(1) QLO2(b0, 1) RORSC14(b1,7)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 0)
+        switch(XTRA0) {
+          case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+        }
+        MOV_ADDDE14(b0,b1,d1,e1) D2(4) LO1 D3(0)
 
-				HI1 D1(1) QLO2(b0, 7) LDSCL4(b1,O2) 	D2(4)	LO1	PRESCALEA2(d2)	D3(2)
-				HI1	D1(1) QLO2(b0, 6) PSBIDATA4(d2)		D2(4)	LO1	SCALE22(b1,0)	D3(2)
-				HI1 D1(1) QLO2(b0, 5) RORSC24(b1,1) 	D2(4)	LO1 RORCLC2(b1) 	D3(2)
-				HI1 D1(1) QLO2(b0, 4) SCROR24(b1,2)		D2(4)	LO1 SCALE22(b1,3)	D3(2)
-				HI1 D1(1) QLO2(b0, 3) RORSC24(b1,4) 	D2(4)	LO1 RORCLC2(b1) 	D3(2)
-				HI1 D1(1) QLO2(b0, 2) SCROR24(b1,5) 	D2(4)	LO1 SCALE22(b1,6)	D3(2)
-				HI1 D1(1) QLO2(b0, 1) RORSC24(b1,7) 	D2(4)	LO1 RORCLC2(b1) 	D3(2)
-				HI1 D1(1) QLO2(b0, 0)
-				switch(XTRA0) {
-					case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-				}
+        HI1 D1(1) QLO2(b0, 7) LDSCL4(b1,O2)   D2(4) LO1 PRESCALEA2(d2)  D3(2)
+        HI1 D1(1) QLO2(b0, 6) PSBIDATA4(d2)   D2(4) LO1 SCALE22(b1,0) D3(2)
+        HI1 D1(1) QLO2(b0, 5) RORSC24(b1,1)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 4) SCROR24(b1,2)   D2(4) LO1 SCALE22(b1,3) D3(2)
+        HI1 D1(1) QLO2(b0, 3) RORSC24(b1,4)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 2) SCROR24(b1,5)   D2(4) LO1 SCALE22(b1,6) D3(2)
+        HI1 D1(1) QLO2(b0, 1) RORSC24(b1,7)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 0)
+        switch(XTRA0) {
+          case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+        }
 
-				// Because Prescale on the middle byte also increments the data counter,
-				// we have to do both halves of updating d2 here - negating it (in the
-				// MOV_NEGD24 macro) and then adding E back into it
-				MOV_NEGD24(b0,b1,d2) D2(4) LO1 ADDDE1(d2,e2) D3(1)
-				HI1 D1(1) QLO2(b0, 7) LDSCL4(b1,O0) 	D2(4)	LO1	PRESCALEA2(d0)	D3(2)
-				HI1	D1(1) QLO2(b0, 6) PRESCALEB4(d0)	D2(4)	LO1	SCALE02(b1,0)	D3(2)
-				HI1 D1(1) QLO2(b0, 5) RORSC04(b1,1) 	D2(4)	LO1 RORCLC2(b1) 	D3(2)
-				HI1 D1(1) QLO2(b0, 4) SCROR04(b1,2)		D2(4)	LO1 SCALE02(b1,3)	D3(2)
-				HI1 D1(1) QLO2(b0, 3) RORSC04(b1,4) 	D2(4)	LO1 RORCLC2(b1)  	D3(2)
-				HI1 D1(1) QLO2(b0, 2) SCROR04(b1,5) 	D2(4)	LO1 SCALE02(b1,6)	D3(2)
-				HI1 D1(1) QLO2(b0, 1) RORSC04(b1,7) 	D2(4)	LO1 RORCLC2(b1) 	D3(2)
-				HI1 D1(1) QLO2(b0, 0)
-				switch(XTRA0) {
-					case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-					case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
-				}
-				MOV_ADDDE04(b0,b1,d0,e0) D2(4) LO1 D3(5)
-				ENDLOOP5
-			}
+        // Because Prescale on the middle byte also increments the data counter,
+        // we have to do both halves of updating d2 here - negating it (in the
+        // MOV_NEGD24 macro) and then adding E back into it
+        MOV_NEGD24(b0,b1,d2) D2(4) LO1 ADDDE1(d2,e2) D3(1)
+        HI1 D1(1) QLO2(b0, 7) LDSCL4(b1,O0)   D2(4) LO1 PRESCALEA2(d0)  D3(2)
+        HI1 D1(1) QLO2(b0, 6) PRESCALEB4(d0)  D2(4) LO1 SCALE02(b1,0) D3(2)
+        HI1 D1(1) QLO2(b0, 5) RORSC04(b1,1)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 4) SCROR04(b1,2)   D2(4) LO1 SCALE02(b1,3) D3(2)
+        HI1 D1(1) QLO2(b0, 3) RORSC04(b1,4)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 2) SCROR04(b1,5)   D2(4) LO1 SCALE02(b1,6) D3(2)
+        HI1 D1(1) QLO2(b0, 1) RORSC04(b1,7)   D2(4) LO1 RORCLC2(b1)   D3(2)
+        HI1 D1(1) QLO2(b0, 0)
+        switch(XTRA0) {
+          case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+        }
+
+        /** Dummy white **/
+        DNOP D2(1) LO1 DNOP D3(1)
+        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+        HI1 D1(1) DNOP LO1 D2(4) DNOP DNOP DNOP D3(0)
+        HI1 D1(1) DNOP LO1
+        switch(XTRA0) {
+          case 4: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 3: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 2: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+          case 1: D2(0) LO1 D3(0) HI1 D1(1) QLO2(b0,0)
+        }
+
+        MOV_ADDDE04(b0,b1,d0,e0) D2(4) LO1 D3(5)
+        ENDLOOP5
+      }
 			DONE;
 		}
 
