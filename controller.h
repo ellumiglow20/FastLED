@@ -11,14 +11,6 @@
 
 FASTLED_NAMESPACE_BEGIN
 
-#define RO(X) RGB_BYTE(RGB_ORDER, X)
-#define RGB_BYTE(RO,X) (((RO)>>(4*(3-(X)))) & 0x3)
-
-#define RGB_BYTE0(RO) ((RO>>12) & 0x3)
-#define RGB_BYTE1(RO) ((RO>>8) & 0x3)
-#define RGB_BYTE2(RO) ((RO>>4) & 0x3)
-#define RGB_BYTE3(RO) ((RO) & 0x3)
-
 // operator byte *(struct CRGB[] arr) { return (byte*)arr; }
 
 #define DISABLE_DITHER 0x00
@@ -341,7 +333,7 @@ struct PixelController {
         }
 
         // Determines whether or not the underlying pixel format is valid for a given "slot" e.g. color channel
-        template<int SLOT> __attribute__((always_inline)) inline bool hasSlot() { RO(SLOT) != 0xFF; }
+        template<int SLOT> __attribute__((always_inline)) inline bool hasSlot() { return RO(SLOT) & 0xF == 0xF; }
 
         template<int SLOT>  __attribute__((always_inline)) inline static uint8_t loadByte(PixelController & pc) { return pc.mData[RO(SLOT)]; }
         template<int SLOT>  __attribute__((always_inline)) inline static uint8_t loadByte(PixelController & pc, int lane) { return pc.mData[pc.mOffsets[lane] + RO(SLOT)]; }

@@ -868,6 +868,14 @@ enum EOrder {
   BGRW=0x2103,
 };
 
+#define RO(X) RGB_BYTE(RGB_ORDER, X)
+#define RGB_BYTE(RO,X) (((RO)>>(4*(3-(X)))) & 0xF)
+
+#define RGB_BYTE0(RO) ((RO>>12) & 0xF)
+#define RGB_BYTE1(RO) ((RO>>8) & 0xF)
+#define RGB_BYTE2(RO) ((RO>>4) & 0xF)
+#define RGB_BYTE3(RO) ((RO) & 0xF)
+
 FASTLED_NAMESPACE_END
 ///@}
 
