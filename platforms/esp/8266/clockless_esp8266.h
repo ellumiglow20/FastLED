@@ -36,7 +36,7 @@ public:
 protected:
 
 	virtual void showPixels(PixelController<RGB_ORDER> & pixels) {
-    // mWait.wait();
+    mWait.wait();
 		int cnt = FASTLED_INTERRUPT_RETRY_COUNT;
     while((showRGBInternal(pixels)==0) && cnt--) {
       #ifdef FASTLED_DEBUG_COUNT_FRAME_RETRIES
@@ -46,7 +46,7 @@ protected:
       delayMicroseconds(WAIT_TIME);
       os_intr_lock();
     }
-    // mWait.mark();
+    mWait.mark();
   }
 
 #define _ESP_ADJ (0)
@@ -71,15 +71,16 @@ protected:
 	// This method is made static to force making register Y available to use for data on AVR - if the method is non-static, then
 	// gcc will use register Y for the this pointer.
 	static uint32_t ICACHE_RAM_ATTR showRGBInternal(PixelController<RGB_ORDER> pixels) {
-		// Setup the pixel controller and load/scale the first byte
+    register bool is4BytePel = pixels.hasSlot3();
+
+    // Setup the pixel controller and load/scale the first byte
 		pixels.preStepFirstByteDithering();
 		register uint32_t b = pixels.loadAndScale0();
     pixels.preStepFirstByteDithering();
+
 		os_intr_lock();
     uint32_t start = __clock_cycles();
 		uint32_t last_mark = start;
-
-    register bool is4BytePel = pixels.hasSlot3();
 
 		while(pixels.has(1)) {
 			// Write first byte, read next byte
