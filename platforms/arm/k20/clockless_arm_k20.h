@@ -82,6 +82,8 @@ protected:
 		pixels.preStepFirstByteDithering();
 		register uint8_t b = pixels.loadAndScale0();
 
+    register bool is4BytePel = pixels.hasSlot3();
+
 		cli();
 		uint32_t next_mark = ARM_DWT_CYCCNT + (T1+T2+T3);
 
@@ -108,6 +110,13 @@ protected:
 			// Write third byte, read 1st byte of next pixel
 			writeBits<8+XTRA0>(next_mark, port, hi, lo, b);
 			b = pixels.advanceAndLoadAndScale0();
+
+      // Write fourth byte, if necessary
+      if (is4BytePel) {
+        uint8_t zero = 0;
+			  writeBits<8+XTRA0>(next_mark, port, hi, lo, zero);
+      }
+
 			#if (FASTLED_ALLOW_INTERRUPTS == 1)
 			sei();
 			#endif
